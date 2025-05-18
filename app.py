@@ -53,7 +53,14 @@ def extract_medical_terms_with_gemini_image(image_data, mime_type="image/jpeg"):
             }
         )
         print("Gemini Response Text:", response.text)
-        json_str = re.sub(r'json\n|\n', '', response.text).strip()
+        
+        # Extract JSON content between ```json and ```
+        json_match = re.search(r'```json\n([\s\S]*?)\n```', response.text)
+        if json_match:
+            json_str = json_match.group(1).strip()
+        else:
+            json_str = response.text.strip()
+        print("JSON String to Parse:", json_str)  # Add this line
         extracted_data = json.loads(json_str)
         return extracted_data
     except json.JSONDecodeError as e:
@@ -119,7 +126,7 @@ def upload_file():
         try:
             results = process_uploaded_file(file_path)
             if not results or (len(results) == 1 and not results[0]["data"]["key_value_pairs"] and not results[0]["data"]["extracted_tests"]):
-                return jsonify({"error": "Failed to extract data from PDF. Ensure poppler-utils is installed and the PDF is valid."}), 500
+                return jsonify({"error": "Failed to extract data from the file. Ensure the file contains readable medical report data."}), 500
             
             if len(results) == 1:
                 final_output = results[0]["data"]
@@ -138,7 +145,6 @@ def upload_file():
             return jsonify({"data": final_output})
         except Exception as e:
             return jsonify({"error": f"Processing failed: {str(e)}"}), 500
-
 
 if __name__ == '__main__':
     port = int(os.getenv("PORT", 5000))  # Use Render's PORT or default to 5000
