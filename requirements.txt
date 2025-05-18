@@ -4,3 +4,4 @@ Pillow==10.4.0
 google-generativeai==0.8.2
 gunicorn
 load_dotenv
+Flask-CORS==5.0.0
