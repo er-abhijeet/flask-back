@@ -3,3 +3,4 @@ pdf2image==1.17.0
 Pillow==10.4.0
 google-generativeai==0.8.2
 gunicorn
+load_dotenv
